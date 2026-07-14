@@ -12,7 +12,7 @@ env:
   ver_b: "b-v0.0.0+1.21.11"
   tag_r: "0.0.0+1.21.11+r.1"
   tag_a: "0.0.0+1.21.11+a.1"
-  tag_b: "0.0.0+1.21.11+b.1"
+  tag_b: "0.0.0+1.21.11+b.3"
   java_ver: "25"
   lib: "dalib"
 
@@ -81,10 +81,57 @@ jobs:
           git add .
           git commit -m "publishing ${{ env.lib }}" || echo "Nothing to commit"
           git push
+          
+  release:
+    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
 
-#  modrinth:
-#    if: ${{ contains(github.event.head_commit.message, '[m]') }}
-#    permissions:
-#      contents: write
-#
-#    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    needs: [ build ]
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download Files
+        uses: actions/download-artifact@v8
+        with:
+          path: jars
+          merge-multiple: true
+
+      - name: release - r
+        if: ${{ !contains(github.event.head_commit.message, '[a]') || !contains(github.event.head_commit.message, '[b]')}}
+        uses: softprops/action-gh-release@v3
+        with:
+          name: Dalib ${{ env.ver_r }}
+          tag_name: ${{ env.tag_r }}
+          body_path: ${{ github.workspace }}/changelog.md
+          draft: true
+          generate_release_notes: true
+          files: |
+            jars/*.jar
+
+      - name: release - a
+        if: ${{ contains(github.event.head_commit.message, '[a]') && !contains(github.event.head_commit.message, '[b]')}}
+        uses: softprops/action-gh-release@v3
+        with:
+          name: Dalib ${{ env.ver_a }}
+          tag_name: ${{ env.tag_a }}
+          body_path: ${{ github.workspace }}/changelog.md
+          draft: true
+          generate_release_notes: true
+          files: |
+            jars/*.jar
+
+      - name: release - b
+        if: ${{ contains(github.event.head_commit.message, '[b]') && !contains(github.event.head_commit.message, '[a]')}}
+        uses: softprops/action-gh-release@v3
+        with:
+          name: Dalib ${{ env.ver_b }}
+          tag_name: ${{ env.tag_b }}
+          body_path: ${{ github.workspace }}/changelog.md
+          draft: true
+          generate_release_notes: true
+          files: |
+            jars/*.jar

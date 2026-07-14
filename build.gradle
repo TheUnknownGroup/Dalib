@@ -12,11 +12,6 @@ def api = project.fabric_api_version
 def javas = project.java_ver
 def mc = project.minecraft_version
 
-//modrinth {
-//	token = System.getenv("MODRINTH_TOKEN")
-//	projectId = ""
-//}
-
 repositories {
 }
 
