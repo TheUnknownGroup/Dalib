@@ -1,0 +1,73 @@
+plugins {
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+	id 'maven-publish'
+	id 'com.modrinth.minotaur' version "2.+"
+}
+
+version = project.mod_version
+group = project.maven_group
+def les = project.property("loader_version")
+def api = project.fabric_api_version
+def javas = project.java_ver
+def mc = project.minecraft_version
+
+modrinth {
+	token = System.getenv("MODRINTH_TOKEN")
+	projectId = ""
+}
+
+repositories {
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${mc}"
+	mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${les}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${api}"
+}
+
+processResources {
+	def version = project.version
+	inputs.property "version", version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": version,
+				"fabric_load" : les,
+				"fabric_api" : api,
+				"java_v" : javas,
+				"mc" : mc
+
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+}
+
+java {
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+jar {
+	def projectName = project.name
+	inputs.property "projectName", projectName
+
+	from("LICENSE") {
+		rename { "${it}_$projectName"}
+	}
+}
+
+publishing {
+	publications {
+		create("mavenJava", MavenPublication) {
+			from components.java
+		}
+	}
+
+	repositories {
+		mavenLocal()
+	}
+}
