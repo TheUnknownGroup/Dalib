@@ -74,10 +74,7 @@ jobs:
       - name: push
         run: |
           git clone https://x-access-token:${{ secrets.MAVEN_TOKEN }}@github.com/TheUnknownMaven/maven.git site
-          cd site
-          mkdir sending/
-          cd ${{ github.workspace }}
-          cp -r build/repo/* site/sending/
+          cp -r build/repo/* site/
           cd site
           git config user.name "devonk15"
           git config user.email "94760159+devonk15@users.noreply.github.com"
