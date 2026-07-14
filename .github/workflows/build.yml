@@ -84,6 +84,7 @@ jobs:
           git add .
           git commit -m "publishing ${{ env.lib }}" || echo "Nothing to commit"
           git push
+
 #  modrinth:
 #    if: ${{ contains(github.event.head_commit.message, '[m]') }}
 #    permissions:
