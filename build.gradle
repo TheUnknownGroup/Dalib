@@ -1,5 +1,6 @@
 plugins {
 	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+	id 'java-library'
 	id 'maven-publish'
 	id 'com.modrinth.minotaur' version "2.+"
 }
@@ -11,10 +12,10 @@ def api = project.fabric_api_version
 def javas = project.java_ver
 def mc = project.minecraft_version
 
-modrinth {
-	token = System.getenv("MODRINTH_TOKEN")
-	projectId = ""
-}
+//modrinth {
+//	token = System.getenv("MODRINTH_TOKEN")
+//	projectId = ""
+//}
 
 repositories {
 }
@@ -64,10 +65,15 @@ publishing {
 	publications {
 		create("mavenJava", MavenPublication) {
 			from components.java
+			groupId = group
+			artifactId = 'dalib'
+			version = version
 		}
 	}
-
 	repositories {
-		mavenLocal()
+		maven {
+			name = "local"
+			url = uri("${rootProject.projectDir}/build/repo")
+		}
 	}
 }

@@ -1,0 +1,89 @@
+name: Build dalib r-v0.0.0+1.21.11
+
+on:
+  push:
+    branches:
+      - r-v0.0.0+1.21.11
+  workflow_dispatch:
+
+env:
+  ver_r: "r-v0.0.0+1.21.11"
+  ver_a: "a-v0.0.0+1.21.11"
+  ver_b: "b-v0.0.0+1.21.11"
+  tag_r: "0.0.0+1.21.11+r.1"
+  tag_a: "0.0.0+1.21.11+a.1"
+  tag_b: "0.0.0+1.21.11+b.1"
+  java_ver: "25"
+  lib: "dalib"
+
+jobs:
+  build:
+    if: ${{ !contains(github.event.head_commit.message, '[skip]') }}
+
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: validate
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: setup jdk
+        uses: actions/setup-java@v5.3.0
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.java_ver }}
+
+      - name: gradlew exe & build
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build
+
+      - name: capture artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: jars
+          path: build/libs
+
+  publish:
+    if: ${{ contains(github.event.head_commit.message, '[pub]') }}
+
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: validate
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: setup jdk
+        uses: actions/setup-java@v5.3.0
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.java_ver }}
+
+      - name: gradlew exe & build
+        run: |
+          chmod +x ./gradlew
+          ./gradlew publish
+
+      - name: push
+        run: |
+          git clone https://x-access-token:${{ secrets.MAVEN_TOKEN }}@github.com/TheUnknownMaven/maven.git site
+          cp -r build/repo/* deploy/
+          cd deploy
+          git config user.name "devonk15"
+          git config user.email "94760159+devonk15@users.noreply.github.com"
+          git add .
+          git commit -m "publishing ${{ env.lib }}" || echo "Nothing to commit"
+          git push
+#  modrinth:
+#    if: ${{ contains(github.event.head_commit.message, '[m]') }}
+#    permissions:
+#      contents: write
+#
+#    runs-on: ubuntu-latest
