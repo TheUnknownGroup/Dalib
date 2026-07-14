@@ -3,7 +3,7 @@ name: Build Dalib r-v0.0.0+1.21.11
 on:
   push:
     branches:
-      - r-v0.0.0+1.21.11
+      - main
   workflow_dispatch:
 
 env:
