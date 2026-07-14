@@ -32,7 +32,6 @@ processResources {
 				"fabric_api" : api,
 				"java_v" : javas,
 				"mc" : mc
-
 	}
 }
 
