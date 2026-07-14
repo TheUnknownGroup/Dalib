@@ -101,7 +101,7 @@ jobs:
           merge-multiple: true
 
       - name: release - r
-        if: ${{ !contains(github.event.head_commit.message, '[a]') || !contains(github.event.head_commit.message, '[b]')}}
+        if: ${{ contains(github.event.head_commit.message, '[r]') }}
         uses: softprops/action-gh-release@v3
         with:
           name: Dalib ${{ env.ver_r }}
@@ -113,7 +113,7 @@ jobs:
             jars/*.jar
 
       - name: release - a
-        if: ${{ contains(github.event.head_commit.message, '[a]') && !contains(github.event.head_commit.message, '[b]')}}
+        if: ${{ contains(github.event.head_commit.message, '[a]') }}
         uses: softprops/action-gh-release@v3
         with:
           name: Dalib ${{ env.ver_a }}
@@ -125,7 +125,7 @@ jobs:
             jars/*.jar
 
       - name: release - b
-        if: ${{ contains(github.event.head_commit.message, '[b]') && !contains(github.event.head_commit.message, '[a]')}}
+        if: ${{ contains(github.event.head_commit.message, '[b]') }}
         uses: softprops/action-gh-release@v3
         with:
           name: Dalib ${{ env.ver_b }}
